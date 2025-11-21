@@ -80,4 +80,47 @@
       });
     });
   };
+
+  window.Api.sendFormData = function (path, method, formData) {
+    var url = window.Api.BASE_API_URL + (path.charAt(0) === "/" ? path : ("/" + path));
+    var token = window.Api.getToken();
+    var headers = {};
+
+    if (token) {
+      headers["Authorization"] = "Bearer " + token;
+    }
+
+    var fetchOptions = { method: method, headers: headers, body: formData };
+
+    return fetch(url, fetchOptions).catch(function (err) {
+      console.error("Fetch error for " + url, err);
+      return Promise.reject({
+        status: 0,
+        message: "Failed to fetch: " + err.message + ". Check if backend is running at " + window.Api.BASE_API_URL,
+        originalError: err
+      });
+    }).then(function (res) {
+      if (res.status === 401) {
+        window.Api.handleUnauthorized();
+        return Promise.reject({ status: 401, message: "Unauthorized" });
+      }
+      if (!res.ok) {
+        return res.text().then(function (text) {
+          return Promise.reject({
+            status: res.status,
+            message: text || "HTTP " + res.status + " error",
+            response: text
+          });
+        });
+      }
+      return res.text().then(function (text) {
+        if (!text) return null;
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          return text;
+        }
+      });
+    });
+  };
 })(window);

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CarRent — Payment Failed</title>
+  <link rel="stylesheet" href="/shared/navbar.css" />
+  <link rel="stylesheet" href="/shared/components.css" />
+  <link rel="stylesheet" href="/pages/payments/payment-failed.css" />
+</head>
+<body class="payment-failed-page">
+  <div id="navbar-root"></div>
+  
+  <main class="payment-container">
+    <div class="payment-card">
+      <div class="payment-status-icon failed-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+      </div>
+
+      <div class="payment-status-content">
+        <h1 class="payment-title">Payment Failed</h1>
+        <p class="payment-subtitle">We couldn't process your payment</p>
+      </div>
+
+      <div class="payment-details" id="payment-details">
+        <div class="detail-row">
+          <span class="detail-label">Reservation ID:</span>
+          <span class="detail-value" id="reservation-id">Loading...</span>
+        </div>
+        <div class="detail-row" id="error-row" style="display: none;">
+          <span class="detail-label">Error:</span>
+          <span class="detail-value error-text" id="error-message"></span>
+        </div>
+      </div>
+
+      <div class="payment-actions">
+        <button class="btn btn-primary btn-full" onclick="window.PaymentFailedPage.retryPayment()">
+          Retry Payment
+        </button>
+        <button class="btn btn-secondary btn-full" onclick="window.location.href='/pages/cars/cars.html'">
+          Back to Cars
+        </button>
+      </div>
+
+      <div class="payment-info">
+        <p>💡 If you continue to experience issues, please contact our support team or try again later.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="/shared/api.js"></script>
+  <script src="/shared/auth.js"></script>
+  <script src="/shared/payments.js"></script>
+  <script src="/shared/navbar.js"></script>
+  <script src="/pages/payments/payment-failed.js"></script>
+</body>
+</html>

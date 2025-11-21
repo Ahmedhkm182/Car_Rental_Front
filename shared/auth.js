@@ -41,10 +41,9 @@
   };
 
   window.Auth.isAdmin = function () {
-    var token = window.Auth.getToken();
-    var payload = window.Auth.decodeJwt(token);
-    if (!payload) return false;
-    var role = payload[ROLE_CLAIM] || payload.role || payload.roles;
+    var user = window.Auth.getCurrentUser();
+    if (!user) return false;
+    var role = user[ROLE_CLAIM] || user.role || user.roles;
     if (Array.isArray(role)) return role.indexOf("Admin") !== -1;
     return role === "Admin";
   };

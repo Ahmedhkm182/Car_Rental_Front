@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CarRent — Choose Payment Method</title>
+  <link rel="stylesheet" href="/shared/navbar.css" />
+  <link rel="stylesheet" href="/shared/components.css" />
+  <link rel="stylesheet" href="/pages/payments/payment-method.css" />
+</head>
+<body class="payment-method-page">
+  <div id="navbar-root"></div>
+  
+  <main class="payment-method-container">
+    <div class="payment-method-card">
+      <div class="payment-header">
+        <h1 class="payment-title">Choose Payment Method</h1>
+        <p class="payment-subtitle">Select how you'd like to pay for your reservation</p>
+      </div>
+
+      <div class="car-info" id="car-info">
+        <div class="car-info-loading">Loading car details...</div>
+      </div>
+
+      <div class="payment-methods">
+        <button class="payment-method-btn" onclick="window.PaymentMethodPage.selectPaymentMethod('credit-card')">
+          <div class="method-icon">💳</div>
+          <div class="method-name">Credit/Debit Card</div>
+          <div class="method-desc">Visa, Mastercard, American Express</div>
+        </button>
+
+        <button class="payment-method-btn" onclick="window.PaymentMethodPage.selectPaymentMethod('stripe')">
+          <div class="method-icon">🔒</div>
+          <div class="method-name">Stripe Checkout</div>
+          <div class="method-desc">Secure payment with Stripe</div>
+        </button>
+
+        <button class="payment-method-btn" onclick="window.PaymentMethodPage.selectPaymentMethod('bank-transfer')">
+          <div class="method-icon">🏦</div>
+          <div class="method-name">Bank Transfer</div>
+          <div class="method-desc">Direct transfer to our account</div>
+        </button>
+      </div>
+
+      <div class="payment-actions">
+        <button class="btn btn-secondary" onclick="window.history.back()">
+          Back to Cars
+        </button>
+      </div>
+
+      <div class="payment-error hidden" id="payment-error">
+        <p id="error-message"></p>
+      </div>
+    </div>
+  </main>
+
+  <script src="/shared/api.js"></script>
+  <script src="/shared/auth.js"></script>
+  <script src="/shared/payments.js"></script>
+  <script src="/shared/navbar.js"></script>
+  <script src="/pages/payments/payment-method.js"></script>
+</body>
+</html>

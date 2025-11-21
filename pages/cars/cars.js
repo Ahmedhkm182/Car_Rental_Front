@@ -18,12 +18,12 @@
     return window.Api.fetch("/Car/" + encodeURIComponent(id), { method: "GET" });
   };
 
-  CarsPage.createCar = function (carData) {
-    return window.Api.fetch("/Car", { method: "POST", body: carData });
+  CarsPage.addCar = function (formData) {
+    return window.Api.sendFormData("/Car/add", "POST", formData);
   };
 
-  CarsPage.updateCar = function (id, carData) {
-    return window.Api.fetch("/Car/" + encodeURIComponent(id), { method: "PUT", body: carData });
+  CarsPage.updateCar = function (id, formData) {
+    return window.Api.sendFormData("/Car/update", "PUT", formData);
   };
 
   CarsPage.deleteCar = function (id) {
@@ -66,7 +66,7 @@
           <div class="car-price">$${Number(car.pricePerDay || 0).toFixed(2)}/day</div>
           <span class="car-status ${statusClass}">${car.status || "Unknown"}</span>
           <div class="car-actions">
-            ${car.status === "Available" ? `<a href="/pages/reservations/reservations.html?carId=${car.id}" class="btn btn-reserve">Reserve Now</a>` : `<button class="btn" disabled style="background: #d1d5db;">Not Available</button>`}
+            ${car.status === "Available" ? `<button class="btn btn-reserve" onclick="window.CarsPage.reserveCar('${car.id}')">Reserve Now</button>` : `<button class="btn" disabled style="background: #d1d5db;">Not Available</button>`}
             ${isAdmin ? `<button class="btn btn-secondary btn-sm" onclick="window.CarsPage.openEditModal('${car.id}')">Edit</button>` : ""}
           </div>
         </div>
@@ -93,7 +93,19 @@
       document.getElementById("modal-year").value = car.year || "";
       document.getElementById("modal-status").value = car.status || "Available";
       document.getElementById("modal-price").value = car.pricePerDay || "";
-      document.getElementById("modal-image").value = car.imageUrl || "";
+      
+      // Reset file input
+      document.getElementById("modal-image-file").value = "";
+      
+      // Show current image preview if exists
+      var previewDiv = document.getElementById("image-preview");
+      var previewImg = document.getElementById("preview-img");
+      if (car.imageUrl) {
+        previewImg.src = car.imageUrl;
+        previewDiv.classList.remove("hidden");
+      } else {
+        previewDiv.classList.add("hidden");
+      }
     }
 
     modal.classList.add("open");
@@ -109,24 +121,52 @@
     modalTitle.innerText = "Add New Car";
     deleteBtn.classList.add("hidden");
     form.reset();
+    
+    // Hide preview
+    document.getElementById("image-preview").classList.add("hidden");
 
     modal.classList.add("open");
   };
 
+  CarsPage.clearImagePreview = function () {
+    document.getElementById("modal-image-file").value = "";
+    document.getElementById("image-preview").classList.add("hidden");
+  };
+
   CarsPage.saveCar = function () {
     var form = document.getElementById("car-form");
-    var data = {
-      make: document.getElementById("modal-make").value,
-      model: document.getElementById("modal-model").value,
-      year: parseInt(document.getElementById("modal-year").value, 10),
-      status: document.getElementById("modal-status").value,
-      pricePerDay: parseFloat(document.getElementById("modal-price").value),
-      imageUrl: document.getElementById("modal-image").value || null
-    };
+    var formData = new FormData();
+    
+    var make = document.getElementById("modal-make").value;
+    var model = document.getElementById("modal-model").value;
+    var year = document.getElementById("modal-year").value;
+    var status = document.getElementById("modal-status").value;
+    var pricePerDay = document.getElementById("modal-price").value;
+    var imageFile = document.getElementById("modal-image-file").files[0];
 
-    if (!data.make || !data.model || !data.year || !data.pricePerDay) {
+    if (!make || !model || !year || !pricePerDay) {
       alert("Please fill in all required fields");
       return;
+    }
+
+    // Build FormData
+    formData.append("Make", make);
+    formData.append("Model", model);
+    formData.append("Year", parseInt(year, 10));
+    formData.append("Status", status);
+    formData.append("PricePerDay", parseFloat(pricePerDay));
+
+    if (imageFile) {
+      formData.append("Image", imageFile);
+    }
+
+    if (currentCarId) {
+      // Edit mode
+      formData.append("Id", currentCarId);
+      var currentCar = allCars.find(function (c) { return c.id === currentCarId; });
+      if (currentCar && currentCar.imageUrl) {
+        formData.append("OldImageUrl", currentCar.imageUrl);
+      }
     }
 
     var saveBtn = document.getElementById("save-car-btn");
@@ -135,8 +175,8 @@
     saveBtn.innerText = "Saving...";
 
     var promise = currentCarId
-      ? CarsPage.updateCar(currentCarId, data)
-      : CarsPage.createCar(data);
+      ? CarsPage.updateCar(currentCarId, formData)
+      : CarsPage.addCar(formData);
 
     promise
       .then(function () {
@@ -152,7 +192,7 @@
       });
   };
 
-  CarsPage.deleteCar = function () {
+  CarsPage.deleteCarConfirm = function () {
     if (!currentCarId) return;
     if (!confirm("Are you sure you want to delete this car?")) return;
 
@@ -173,6 +213,16 @@
         deleteBtn.disabled = false;
         deleteBtn.innerText = originalText;
       });
+  };
+
+  CarsPage.reserveCar = function (carId) {
+    if (!carId) {
+      alert("Car ID not found");
+      return;
+    }
+
+    // Redirect to payment page with car ID
+    window.location.href = "/pages/payments/payment-method.html?carId=" + encodeURIComponent(carId);
   };
 
   CarsPage.loadCars = function () {
@@ -256,7 +306,25 @@
     var deleteBtn = document.getElementById("delete-car-btn");
     if (deleteBtn) {
       deleteBtn.addEventListener("click", function () {
-        CarsPage.deleteCar();
+        CarsPage.deleteCarConfirm();
+      });
+    }
+
+    // Image file input change event
+    var imageFileInput = document.getElementById("modal-image-file");
+    if (imageFileInput) {
+      imageFileInput.addEventListener("change", function (e) {
+        var file = e.target.files[0];
+        if (file) {
+          var reader = new FileReader();
+          reader.onload = function (event) {
+            var previewDiv = document.getElementById("image-preview");
+            var previewImg = document.getElementById("preview-img");
+            previewImg.src = event.target.result;
+            previewDiv.classList.remove("hidden");
+          };
+          reader.readAsDataURL(file);
+        }
       });
     }
 

@@ -7,6 +7,10 @@
     return window.Api.fetch("/Reservation/my", { method: "GET" });
   };
 
+  ReservationsPage.getAllReservations = function () {
+    return window.Api.fetch("/Reservation/all", { method: "GET" });
+  };
+
   ReservationsPage.cancelReservation = function (id) {
     return window.Api.fetch("/Reservation/" + encodeURIComponent(id), { method: "DELETE" });
   };
@@ -62,6 +66,7 @@
 
         <div class="reservation-actions">
           ${reservation.status === "Active" ? `<button class="btn btn-danger btn-sm" onclick="window.ReservationsPage.cancelReservationPrompt('${reservation.id}')">Cancel</button>` : ""}
+          ${reservation.status === "Active" ? `<button class="btn btn-primary btn-sm" onclick="window.ReservationsPage.initiatePayment('${reservation.id}')">Pay</button>` : ""}
           <button class="btn btn-secondary btn-sm" onclick="window.ReservationsPage.viewDetails('${reservation.id}')">Details</button>
         </div>
       `;
@@ -94,13 +99,41 @@
     alert("Reservation ID: " + id);
   };
 
+  ReservationsPage.initiatePayment = function (reservationId) {
+    if (!reservationId) {
+      alert("Reservation ID not found");
+      return;
+    }
+
+    var btn = event.target;
+    btn.disabled = true;
+    var originalText = btn.innerText;
+    btn.innerText = "Processing...";
+
+    window.Payments.createPaymentSession(reservationId)
+      .then(function () {
+        // Redirect happens automatically in createPaymentSession
+      })
+      .catch(function (err) {
+        console.error("Failed to create payment session:", err);
+        alert(err.message || "Failed to initiate payment. Please try again.");
+        btn.disabled = false;
+        btn.innerText = originalText;
+      });
+  };
+
   ReservationsPage.loadReservations = function () {
     var container = document.getElementById("reservations-list");
     if (!container) return;
 
     container.innerHTML = '<div class="loading-spinner"></div>';
 
-    ReservationsPage.getMyReservations()
+    var isAdmin = window.Auth && window.Auth.isAdmin && window.Auth.isAdmin();
+    var promise = isAdmin
+      ? ReservationsPage.getAllReservations()
+      : ReservationsPage.getMyReservations();
+
+    promise
       .then(function (reservations) {
         ReservationsPage.renderReservations(reservations || []);
       })
@@ -114,6 +147,12 @@
     if (!window.Auth || !window.Auth.isAuthenticated || !window.Auth.isAuthenticated()) {
       window.location.href = "/pages/login/login.html";
       return;
+    }
+
+    var isAdmin = window.Auth.isAdmin && window.Auth.isAdmin();
+    var pageTitle = document.getElementById("page-title");
+    if (pageTitle) {
+      pageTitle.innerText = isAdmin ? "All Reservations" : "My Reservations";
     }
 
     ReservationsPage.loadReservations();

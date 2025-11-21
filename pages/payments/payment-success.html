@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CarRent — Payment Successful</title>
+  <link rel="stylesheet" href="/shared/navbar.css" />
+  <link rel="stylesheet" href="/shared/components.css" />
+  <link rel="stylesheet" href="/pages/payments/payment-success.css" />
+</head>
+<body class="payment-success-page">
+  <div id="navbar-root"></div>
+  
+  <main class="payment-container">
+    <div class="payment-card">
+      <div class="payment-status-icon success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+
+      <div class="payment-status-content">
+        <h1 class="payment-title">Payment Successful</h1>
+        <p class="payment-subtitle" id="status-message">Your payment has been processed</p>
+      </div>
+
+      <div class="payment-details" id="payment-details">
+        <div class="detail-row">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value" id="payment-status">Processing...</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Reservation ID:</span>
+          <span class="detail-value" id="reservation-id">Loading...</span>
+        </div>
+      </div>
+
+      <div class="payment-actions">
+        <button class="btn btn-primary btn-full" onclick="window.location.href='/pages/reservations/reservations.html'">
+          View Reservations
+        </button>
+        <button class="btn btn-secondary btn-full" onclick="window.location.href='/pages/cars/cars.html'">
+          Browse Cars
+        </button>
+      </div>
+
+      <div class="payment-error hidden" id="payment-error">
+        <p id="error-message"></p>
+      </div>
+    </div>
+  </main>
+
+  <script src="/shared/api.js"></script>
+  <script src="/shared/auth.js"></script>
+  <script src="/shared/payments.js"></script>
+  <script src="/shared/navbar.js"></script>
+  <script src="/pages/payments/payment-success.js"></script>
+</body>
+</html>
