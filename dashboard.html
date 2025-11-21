@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CarRent — Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white">
+  <div id="nav-root"></div>
+  <main class="pt-20">
+    <div class="container-max mx-auto px-4 py-8">
+      <h1 class="text-3xl font-bold mb-8">Admin Dashboard</h1>
+      <div id="admin-content">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="glass p-6 rounded-xl card">
+            <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">Total Revenue</p>
+            <p id="stat-revenue" class="text-2xl font-bold mt-2">$0</p>
+          </div>
+          <div class="glass p-6 rounded-xl card">
+            <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">Active Reservations</p>
+            <p id="stat-reservations" class="text-2xl font-bold mt-2">0</p>
+          </div>
+          <div class="glass p-6 rounded-xl card">
+            <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">Total Cars</p>
+            <p id="stat-cars" class="text-2xl font-bold mt-2">0</p>
+          </div>
+          <div class="glass p-6 rounded-xl card">
+            <p class="text-slate-600 dark:text-slate-400 text-sm font-medium">Total Users</p>
+            <p id="stat-users" class="text-2xl font-bold mt-2">0</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="glass p-6 rounded-xl card">
+            <h3 class="font-bold text-lg mb-4">Top Rented Cars</h3>
+            <div id="top-cars"></div>
+          </div>
+          <div class="glass p-6 rounded-xl card">
+            <h3 class="font-bold text-lg mb-4">Daily Revenue (Last 7 Days)</h3>
+            <div id="daily-data" style="min-height:200px"></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <div class="glass p-6 rounded-xl card">
+            <h3 class="font-bold text-lg mb-4">Monthly Revenue (Last 12 Months)</h3>
+            <div id="monthly-data" style="min-height:240px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <script>
+    window.UI.mountNavbar();
+    if (window.Dashboard && window.Dashboard.initAdminPage) { window.Dashboard.initAdminPage(); }
+  </script>
+</body>
+</html>

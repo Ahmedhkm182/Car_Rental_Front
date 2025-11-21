@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CarRent — Login</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Indigo Gradient -->
+  <style>
+    body {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 40%, #4338ca 100%) !important;
+      background-attachment: fixed;
+    }
+  </style>
+
+  <link rel="stylesheet" href="/css/style.css?v=142" />
+</head>
+
+<body class="flex flex-col">
+
+  <div id="nav-root"></div>
+
+  <main class="flex-1 flex items-center justify-center min-h-screen px-4">
+
+    <div class="w-full max-w-md glass p-10 rounded-2xl card animate-fade-in"
+      style="background: rgba(255,255,255,0.92);">
+
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold mb-2" style="color:#4f46e5;">Welcome Back</h2>
+        <p class="login-subtext mb-8">Sign in to continue</p>
+      </div>
+
+      <div id="auth-error"
+        class="text-rose-600 bg-rose-50 p-3 rounded-lg mb-4 hidden"></div>
+
+      <form id="login-form" class="space-y-6">
+
+        <div>
+          <label class="block text-sm font-medium mb-1 text-black">Email</label>
+          <input name="email" type="email" class="form-input" placeholder="you@example.com" required>
+
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1 text-black">Password</label>
+         <input name="password" type="password" class="form-input" placeholder="••••••••" required>
+
+        </div>
+
+        <button type="submit" class="btn-primary full">
+  Sign In
+</button>
+
+
+      </form>
+
+      <p class="footer-text mt-6">
+        No account?
+        <a href="/register.html">Create one</a>
+      </p>
+
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/ui.js"></script>
+
+  <script>
+    window.UI.mountNavbar();
+    window.Auth.initLoginPage();
+  </script>
+ <script>
+  document.querySelectorAll('.form-input').forEach(input => {
+    input.addEventListener('focus', () => {
+      input.dataset.ph = input.getAttribute('placeholder'); // حفظ النص
+      input.setAttribute('placeholder', ''); // مسحه للأبد
+    });
+  });
+</script>
+
+</body>
+
+</html>

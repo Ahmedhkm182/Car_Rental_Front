@@ -1,0 +1,277 @@
+/* ============================================
+   Background Gradient Indigo
+============================================ */
+body {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 45%, #4338ca 100%);
+  background-attachment: fixed;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ============================================
+   Login Layout
+============================================ */
+.login-wrapper {
+  width: 100%;
+  padding: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 40px;
+  border-radius: 16px;
+}
+
+/* Glass Effect */
+.glass {
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Fade animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeIn .45s ease-out; }
+
+/* ============================================
+   Titles
+============================================ */
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+}
+.subtitle {
+  color: #e0e0ff;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* ============================================
+   Form
+============================================ */
+.form-area {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group label {
+  color: white;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* FINAL FIX: Custom Input (Tailwind-proof) */
+.form-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  font-size: 1rem;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.35);
+
+  background: rgba(255,255,255,0.92);
+  color: #000;
+
+  transition: .15s ease;
+}
+
+/* Placeholder fix */
+.form-input::placeholder {
+  color: #555;
+  opacity: 1;
+}
+
+/* Remove placeholder on focus */
+.form-input:focus::placeholder {
+  opacity: 0;
+}
+
+/* Focus style */
+.form-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
+  outline: none;
+}
+
+/* ============================================
+   Button
+============================================ */
+.btn-primary {
+  background: linear-gradient(90deg, #4f46e5, #6366f1);
+  color: white;
+  padding: 14px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: .2s;
+}
+
+.btn-primary:hover {
+  opacity: .92;
+}
+
+.full { width: 100%; }
+
+/* ============================================
+   Footer
+============================================ */
+.footer-text {
+  margin-top: 18px;
+  text-align: center;
+  color: #e4e4ff;
+}
+.footer-text a {
+  color: #fff;
+  text-decoration: underline;
+}
+/* ------------------------
+   FIX INPUT (FINAL)
+------------------------- */
+
+.form-input {
+  width: 100% !important;
+  height: 48px !important;
+  padding: 0 16px !important;
+
+  background: #ffffff !important;
+  color: #000 !important;
+
+  border-radius: 10px !important;
+  border: 1px solid #cbd5e1 !important;
+
+  font-size: 1rem !important;
+
+  outline: none !important;
+  box-shadow: none !important;
+
+  transition: .15s ease;
+}
+
+/* placeholder normal */
+.form-input::placeholder {
+  color: #777 !important;
+  opacity: 1 !important;
+}
+
+/* placeholder disappears on focus */
+.form-input:focus::placeholder {
+  opacity: 0 !important;
+  color: transparent !important;
+}
+
+/* on focus */
+.form-input:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.25) !important;
+}
+
+/* ------------------------
+   BUTTON FIX (FINAL)
+------------------------- */
+.btn-primary {
+  width: 100%;
+  padding: 14px 0;
+  border-radius: 10px;
+
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+
+  background: linear-gradient(90deg, #4f46e5, #6366f1);
+
+  transition: .2s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* ------------------------
+   Text Under Button
+------------------------- */
+.footer-text,
+.footer-text a {
+  color: #0f0f0f !important;
+}
+/* placeholder disappears on focus (even before typing) */
+.form-input:focus::placeholder {
+  opacity: 0 !important;
+  color: transparent !important;
+}
+/* Cars Grid Layout */
+.cars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 30px;
+}
+/* Page container spacing for cars */
+.cars-section {
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1200px;
+}
+
+/* Car card fix */
+.cars-grid .card {
+  padding: 20px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  transition: .2s ease;
+}
+
+.cars-grid .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* Fix image sizes */
+.cars-grid img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Price + text */
+.car-price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4f46e5;
+}
+
+.car-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.car-meta {
+  font-size: 0.85rem;
+  opacity: .8;
+}
+.hero-gradient {
+  padding-top: 80px !important;
+  padding-bottom: 80px !important;
+}
+
+.hero-gradient h1 {
+  font-size: 2.5rem !important;
+}
+
+.hero-gradient p {
+  font-size: 1rem !important;
+  max-width: 600px;
+}

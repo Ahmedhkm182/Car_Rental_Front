@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CarRent — Register</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Indigo Gradient Background -->
+  <style>
+    body {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 40%, #4338ca 100%) !important;
+      background-attachment: fixed;
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+
+  <link rel="stylesheet" href="/css/style.css?v=115" />
+</head>
+
+<body class="flex flex-col">
+  <div id="nav-root"></div>
+
+  <main class="flex-1 flex items-center justify-center min-h-screen px-4">
+
+    <div class="w-full max-w-md glass p-10 rounded-2xl card animate-fade-in"
+      style="background: rgba(255,255,255,0.92);">
+
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold mb-2" style="color:#4f46e5;">Create Account</h2>
+        <p class="login-subtext text-center mb-8">Join CarRent and start renting now</p>
+      </div>
+
+      <div id="auth-error"
+        class="text-rose-600 bg-rose-50 dark:bg-rose-900/20 p-3 rounded-lg mb-4 hidden"></div>
+
+      <form id="register-form" class="space-y-6">
+
+        <div>
+          <label class="block text-sm font-medium mb-1 text-slate-700">Full Name</label>
+          <input name="fullName" type="text" placeholder="Your Full Name" class="form-input" required />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1 text-slate-700">Email</label>
+          <input name="email" type="email" placeholder="you@example.com" class="form-input" required />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1 text-slate-700">Password</label>
+          <input name="password" type="password" placeholder="••••••••" class="form-input" required />
+        </div>
+
+        <button type="submit" class="w-full btn-primary" style="padding:14px 0; border-radius:10px;">
+          Create Account
+        </button>
+
+      </form>
+
+      <p class="footer-text mt-6">
+        Already have an account?
+        <a href="/login.html">Sign in</a>
+      </p>
+
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/ui.js"></script>
+
+  <script>
+    window.UI.mountNavbar();
+    window.Auth.initRegisterPage();
+
+    // Placeholder hiding fix —
+    document.querySelectorAll(".form-input").forEach(input => {
+      input.addEventListener("focus", () => {
+        input.dataset.old = input.placeholder;
+        input.placeholder = "";
+      });
+    });
+  </script>
+
+</body>
+</html>

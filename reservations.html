@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CarRent — Reservations</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white">
+  <div id="nav-root"></div>
+  <main class="pt-20">
+    <div class="container-max mx-auto px-4 py-8">
+      <h1 class="text-3xl font-bold mb-8">My Reservations</h1>
+
+      <!-- Create Reservation Card -->
+      <div class="glass p-6 rounded-xl card mb-8 animate-fade-in">
+        <h2 class="text-2xl font-bold mb-4">New Reservation</h2>
+        <form id="reservation-create-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">Car ID</label>
+            <input name="carId" type="number" required placeholder="Enter car ID" class="w-full" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">Start Date & Time</label>
+            <input name="startDate" type="datetime-local" required class="w-full" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">End Date & Time</label>
+            <input name="endDate" type="datetime-local" required class="w-full" />
+          </div>
+          <div class="md:col-span-3">
+            <button type="submit" class="w-full btn btn-primary">Create Reservation</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Reservations List -->
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Your Reservations</h2>
+        <div id="reservations-list"></div>
+      </div>
+    </div>
+  </main>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/notifications.js"></script>
+  <script src="/js/reservations.js"></script>
+  <script>
+    window.UI.mountNavbar();
+    if (window.Reservations && window.Reservations.initReservationsPage) window.Reservations.initReservationsPage();
+    window.UI.refreshNotifCount();
+  </script>
+</body>
+</html>
