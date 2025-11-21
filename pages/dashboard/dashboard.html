@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CarRent — Admin Dashboard</title>
+  <link rel="stylesheet" href="/shared/navbar.css" />
+  <link rel="stylesheet" href="/shared/components.css" />
+  <link rel="stylesheet" href="/pages/dashboard/dashboard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div id="navbar-root"></div>
+
+  <main class="dashboard-page">
+    <div class="dashboard-container">
+      <h1 class="dashboard-title">Admin Dashboard</h1>
+
+      <!-- Stats Section -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-content">
+            <div class="stat-label">Total Revenue</div>
+            <div id="stat-revenue" class="stat-value">$0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-content">
+            <div class="stat-label">Active Reservations</div>
+            <div id="stat-reservations" class="stat-value">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🚗</div>
+          <div class="stat-content">
+            <div class="stat-label">Total Cars</div>
+            <div id="stat-cars" class="stat-value">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <div class="stat-label">Total Users</div>
+            <div id="stat-users" class="stat-value">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3 class="chart-title">Daily Revenue (Last 7 Days)</h3>
+          <div id="daily-data"></div>
+        </div>
+
+        <div class="chart-card">
+          <h3 class="chart-title">Monthly Revenue (Last 12 Months)</h3>
+          <div id="monthly-data"></div>
+        </div>
+      </div>
+
+      <!-- Top Cars Section -->
+      <div class="table-card">
+        <h3 class="chart-title">Top Rented Cars</h3>
+        <div id="top-cars"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/shared/api.js"></script>
+  <script src="/shared/auth.js"></script>
+  <script src="/shared/navbar.js"></script>
+  <script src="/pages/dashboard/dashboard.js"></script>
+</body>
+</html>

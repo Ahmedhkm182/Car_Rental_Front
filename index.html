@@ -1,50 +1,138 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CarRent — Home</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/css/style.css?v=252" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CarRent — Your Premium Car Rental Service</title>
+  <link rel="stylesheet" href="/shared/navbar.css" />
+  <link rel="stylesheet" href="/shared/components.css" />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/home.css" />
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white">
-  <div id="nav-root"></div>
+<body>
+  <div id="navbar-root"></div>
+
   <main>
     <!-- Hero Section -->
-    <section class="hero-gradient pt-32 pb-20 text-center relative overflow-hidden">
-      <div class="absolute inset-0 opacity-10">
-        <div class="absolute top-10 left-10 w-40 h-40 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-10 right-10 w-40 h-40 rounded-full blur-3xl"></div>
-      </div>
-      <div class="container-max mx-auto px-4 relative z-10 animate-fade-in">
-        <h1 class="hero-accent text-4xl md:text-5xl font-bold mb-4">Your Journey Starts Here</h1>
-        <p class="hero-accent text-lg md:text-xl opacity-90 mb-8 max-w-2xl mx-auto leading-relaxed">
-          Discover a wide selection of premium cars for every adventure. Easy booking, transparent pricing, and exceptional service.
-        </p>
-        <div class="flex flex-col md:flex-row gap-4 justify-center">
-          <a href="/cars.html" class="inline-flex items-center justify-center px-8 py-3 bg-white text-teal-600 font-semibold rounded-lg hover:shadow-lg transition">Browse Cars</a>
-          <a href="/reservations.html" class="inline-flex items-center justify-center px-8 py-3 bg-white/20 text-white font-semibold rounded-lg border border-white/30 hover:bg-white/30 transition">My Reservations</a>
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-background">
+          <div class="blob blob-1"></div>
+          <div class="blob blob-2"></div>
+        </div>
+
+        <div class="hero-inner">
+          <h1 class="hero-title">Your Journey Starts Here</h1>
+          <p class="hero-subtitle">
+            Discover a wide selection of premium cars for every adventure. Easy booking, transparent pricing, and exceptional service.
+          </p>
+          <div class="hero-actions">
+            <a href="/pages/cars/cars.html" class="btn btn-primary">Browse Cars</a>
+            <a href="/pages/reservations/reservations.html" class="btn btn-secondary">My Reservations</a>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Featured Section -->
-    <section class="cars-section">
+    <!-- Featured Cars Section -->
+    <section class="featured-section">
+      <div class="container">
+        <h2 class="section-heading">Available Cars</h2>
+        <p class="section-subtitle">Check out our latest additions</p>
 
-      <h2 class="text-3xl font-bold mb-8 text-center">Available Cars</h2>
-      <div id="cars-list" class="cars-grid"></div>
+        <div id="featured-cars" class="cars-grid"></div>
 
+        <div class="section-footer">
+          <a href="/pages/cars/cars.html" class="btn btn-primary">View All Cars</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <div class="container">
+        <h2 class="section-heading">Why Choose CarRent?</h2>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🚗</div>
+            <h3 class="feature-title">Wide Selection</h3>
+            <p class="feature-text">Choose from our extensive fleet of quality vehicles to suit any occasion.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">💰</div>
+            <h3 class="feature-title">Affordable Pricing</h3>
+            <p class="feature-text">Transparent pricing with no hidden fees. What you see is what you pay.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3 class="feature-title">Easy Booking</h3>
+            <p class="feature-text">Quick and simple booking process. Reserve your car in just a few clicks.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📞</div>
+            <h3 class="feature-title">24/7 Support</h3>
+            <p class="feature-text">Our dedicated support team is always available to help you.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3 class="feature-title">Safe & Secure</h3>
+            <p class="feature-text">All vehicles are insured and regularly maintained for your safety.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🌍</div>
+            <h3 class="feature-title">Flexible Locations</h3>
+            <p class="feature-text">Pick up and drop off at multiple convenient locations.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <div class="container">
+        <h2 class="cta-title">Ready to Rent?</h2>
+        <p class="cta-subtitle">Start your journey today with CarRent</p>
+        <a href="/pages/cars/cars.html" class="btn btn-primary btn-lg">Browse Our Fleet</a>
+      </div>
     </section>
   </main>
-  <script src="/js/api.js"></script>
-  <script src="/js/auth.js"></script>
-  <script src="/js/ui.js"></script>
-  <script src="/js/notifications.js"></script>
-  <script src="/js/cars.js"></script>
-  <script>
-    window.UI.mountNavbar();
-    if (window.Cars && window.Cars.initCarsPage) window.Cars.initCarsPage();
-    window.UI.refreshNotifCount();
-  </script>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>About CarRent</h4>
+          <p>Your trusted partner for premium car rentals.</p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="/pages/cars/cars.html">Browse Cars</a></li>
+            <li><a href="/pages/reservations/reservations.html">My Reservations</a></li>
+            <li><a href="/pages/notifications/notifications.html">Notifications</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Contact</h4>
+          <p>Email: support@carrent.com</p>
+          <p>Phone: 1-800-CAR-RENT</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 CarRent. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/shared/api.js"></script>
+  <script src="/shared/auth.js"></script>
+  <script src="/shared/navbar.js"></script>
+  <script src="/js/home.js"></script>
 </body>
 </html>

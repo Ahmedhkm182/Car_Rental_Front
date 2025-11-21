@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CarRent — Register</title>
+  <link rel="stylesheet" href="/shared/navbar.css" />
+  <link rel="stylesheet" href="/shared/components.css" />
+  <link rel="stylesheet" href="/pages/register/register.css" />
+</head>
+<body class="register-page">
+  <div id="navbar-root"></div>
+  
+  <main class="register-container">
+    <div class="register-card">
+      <div class="register-header">
+        <h1 class="register-title">Create Account</h1>
+        <p class="register-subtitle">Join CarRent and start renting now</p>
+      </div>
+
+      <div id="auth-error" class="form-error-box hidden"></div>
+
+      <form id="register-form" class="register-form">
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input
+            id="fullName"
+            name="fullName"
+            type="text"
+            class="form-input"
+            placeholder="Your Full Name"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            class="form-input"
+            placeholder="you@example.com"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            class="form-input"
+            placeholder="••••••••"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+      </form>
+
+      <p class="register-footer">
+        Already have an account?
+        <a href="/pages/login/login.html">Sign in</a>
+      </p>
+    </div>
+  </main>
+
+  <script src="/shared/api.js"></script>
+  <script src="/shared/auth.js"></script>
+  <script src="/shared/navbar.js"></script>
+  <script src="/pages/register/register.js"></script>
+</body>
+</html>

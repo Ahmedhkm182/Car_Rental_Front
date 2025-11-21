@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CarRent — Notifications</title>
+  <link rel="stylesheet" href="/shared/navbar.css" />
+  <link rel="stylesheet" href="/shared/components.css" />
+  <link rel="stylesheet" href="/pages/notifications/notifications.css" />
+</head>
+<body>
+  <div id="navbar-root"></div>
+
+  <main class="notif-page">
+    <div class="notif-container">
+      <div class="notif-header">
+        <h1 class="notif-title">Notifications</h1>
+        <button id="mark-all-btn" class="btn btn-primary">Mark All as Read</button>
+      </div>
+
+      <div id="notifications-list" class="notif-list"></div>
+    </div>
+  </main>
+
+  <script src="/shared/api.js"></script>
+  <script src="/shared/auth.js"></script>
+  <script src="/shared/navbar.js"></script>
+  <script src="/pages/notifications/notifications.js"></script>
+</body>
+</html>
