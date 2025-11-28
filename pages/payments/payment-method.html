@@ -22,12 +22,7 @@
         <div class="car-info-loading">Loading car details...</div>
       </div>
 
-      <div class="payment-methods">
-        <button class="payment-method-btn" onclick="window.PaymentMethodPage.selectPaymentMethod('credit-card')">
-          <div class="method-icon">💳</div>
-          <div class="method-name">Credit/Debit Card</div>
-          <div class="method-desc">Visa, Mastercard, American Express</div>
-        </button>
+      
 
         <button class="payment-method-btn" onclick="window.PaymentMethodPage.selectPaymentMethod('stripe')">
           <div class="method-icon">🔒</div>
@@ -35,11 +30,7 @@
           <div class="method-desc">Secure payment with Stripe</div>
         </button>
 
-        <button class="payment-method-btn" onclick="window.PaymentMethodPage.selectPaymentMethod('bank-transfer')">
-          <div class="method-icon">🏦</div>
-          <div class="method-name">Bank Transfer</div>
-          <div class="method-desc">Direct transfer to our account</div>
-        </button>
+        
       </div>
 
       <div class="payment-actions">
@@ -59,5 +50,9 @@
   <script src="/shared/payments.js"></script>
   <script src="/shared/navbar.js"></script>
   <script src="/pages/payments/payment-method.js"></script>
+<script src="/pages/payments/payment-method.js?v=999"></script>
+
+
+
 </body>
 </html>

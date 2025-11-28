@@ -54,6 +54,7 @@
   };
 
   PaymentMethodPage.selectPaymentMethod = function (method) {
+    console.log("🔥 selectPaymentMethod called:", method);
     if (!currentCarId) {
       alert("Car ID not found");
       return;
@@ -67,9 +68,9 @@
         break;
 
       case 'stripe':
-        // Create a reservation first, then initiate payment
         PaymentMethodPage.initiateStripePayment();
         break;
+
 
       case 'bank-transfer':
         // Redirect to bank transfer instructions
@@ -81,17 +82,72 @@
     }
   };
 
+  PaymentMethodPage.createReservation = function () {
+    return window.Api.fetch("/Reservation/create", {
+      method: "POST",
+      body: {
+        carId: Number(currentCarId),
+        startDate: new Date().toISOString(),
+        endDate: new Date().toISOString()
+      }
+    });
+  };
+
+
   PaymentMethodPage.initiateStripePayment = function () {
+    console.log("🔥 Stripe Clicked!", currentCarId);
+
     if (!currentCarId) {
       alert("Car ID not found");
       return;
     }
 
-    // For now, redirect to a reservation page to create the reservation first
-    // Then proceed with payment
-    var redirectUrl = "/pages/reservations/reservations.html?carId=" + encodeURIComponent(currentCarId) + "&fromPayment=true";
-    window.location.href = redirectUrl;
+    // 1) هات reservationId لو موجود
+    var reservationId = PaymentMethodPage.getQueryParam("reservationId");
+
+    console.log("reservationId:", reservationId);
+
+    // 2) لو مفيش → اعمله Placeholder مؤقت (لحد ما تبني صفحة الحجز الفعلية)
+    if (!reservationId) {
+      reservationId = currentCarId; // مؤقت لحد ما يبدأ الحجز بجد
+    }
+
+    // 3) بنعمل payload
+    var payload = {
+      reservationId: Number(reservationId),
+      successUrl: window.location.origin + "/pages/payments/payment-success.html",
+      cancelUrl: window.location.origin + "/pages/payments/payment-cancel.html"
+    };
+
+    console.log("🚀 Sending payload:", payload);
+
+    // 4) API call
+    window.Api.fetch("/Payment/create-session", {
+      method: "POST",
+      body: payload
+    })
+      .then(function (res) {
+        console.log("🔵 Stripe API Response:", res);
+
+        if (!res || !res.checkoutUrl) {
+          alert("Payment session failed");
+          return;
+        }
+
+        console.log("Redirecting to:", res.checkoutUrl);
+
+        // 5) Redirect to Stripe checkout URL
+        window.location.href = res.checkoutUrl;
+      })
+      .catch(function (err) {
+        console.error("❌ Stripe Error:", err);
+        alert("Error creating payment session");
+      });
   };
+
+
+
+
 
   PaymentMethodPage.init = function () {
     // Check authentication

@@ -48,7 +48,21 @@
       var card = document.createElement("div");
       card.className = "car-card";
 
-      var image = car.imageUrl || "/assets/car-placeholder.svg";
+      // Process image URL safely
+      var image = car.imageUrl;
+
+      // لو مفيش صورة خالص — حط placeholder
+      if (!image || image.trim() === "") {
+        image = "/assets/car-placeholder.svg";
+      }
+
+      // لو السيرفر رجّع لينك Relavtive زى /images/cars/xxx  
+      // نحوله Full URL حسب الدومين
+      if (image.startsWith("/")) {
+        image = window.location.origin + image;
+      }
+
+
       var statusClass = (car.status || "").toLowerCase().replace(" ", "-");
 
       var html = `
@@ -93,10 +107,10 @@
       document.getElementById("modal-year").value = car.year || "";
       document.getElementById("modal-status").value = car.status || "Available";
       document.getElementById("modal-price").value = car.pricePerDay || "";
-      
+
       // Reset file input
       document.getElementById("modal-image-file").value = "";
-      
+
       // Show current image preview if exists
       var previewDiv = document.getElementById("image-preview");
       var previewImg = document.getElementById("preview-img");
@@ -121,7 +135,7 @@
     modalTitle.innerText = "Add New Car";
     deleteBtn.classList.add("hidden");
     form.reset();
-    
+
     // Hide preview
     document.getElementById("image-preview").classList.add("hidden");
 
@@ -136,7 +150,7 @@
   CarsPage.saveCar = function () {
     var form = document.getElementById("car-form");
     var formData = new FormData();
-    
+
     var make = document.getElementById("modal-make").value;
     var model = document.getElementById("modal-model").value;
     var year = document.getElementById("modal-year").value;
