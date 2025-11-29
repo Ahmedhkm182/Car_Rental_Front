@@ -16,6 +16,30 @@
   <main class="notif-page">
     <div class="notif-container">
       <div class="notif-header">
+        <div class="notif-settings-box">
+  <h2 class="notif-settings-title">Notification Preferences</h2>
+
+  <label class="notif-setting-item">
+    <input type="checkbox" id="pref-created"> Email on Reservation Created
+  </label>
+
+  <label class="notif-setting-item">
+    <input type="checkbox" id="pref-updated"> Email on Reservation Updated
+  </label>
+
+  <label class="notif-setting-item">
+    <input type="checkbox" id="pref-payment-success"> Email on Payment Success
+  </label>
+
+  <label class="notif-setting-item">
+    <input type="checkbox" id="pref-payment-failed"> Email on Payment Failed
+  </label>
+
+  <button id="save-prefs-btn" class="btn btn-primary" style="margin-top:15px;">
+    Save Preferences
+  </button>
+</div>
+
         <h1 class="notif-title">Notifications</h1>
         <button id="mark-all-btn" class="btn btn-primary">Mark All as Read</button>
       </div>

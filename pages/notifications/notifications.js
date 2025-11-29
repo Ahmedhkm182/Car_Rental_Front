@@ -24,6 +24,17 @@
       method: "PUT"
     });
   };
+  NotificationsPage.fetchPreferences = function () {
+    return window.Api.fetch("/Notification/preferences", { method: "GET" });
+  };
+
+  NotificationsPage.updatePreferences = function (prefs) {
+    return window.Api.fetch("/Notification/preferences", {
+      method: "PUT",
+      body: prefs
+    });
+  };
+
 
   /* ================================
      📌 RENDER FUNCTIONS
@@ -216,6 +227,21 @@
     }
   }
 
+  NotificationsPage.loadPreferences = function () {
+    NotificationsPage.fetchPreferences()
+      .then(function (prefs) {
+        console.log("Loaded Prefs:", prefs);
+
+        document.getElementById("pref-created").checked = prefs.emailOnReservationCreated;
+        document.getElementById("pref-updated").checked = prefs.emailOnReservationUpdated;
+        document.getElementById("pref-payment-success").checked = prefs.emailOnPaymentSuccess;
+        document.getElementById("pref-payment-failed").checked = prefs.emailOnPaymentFailed;
+      })
+      .catch(function () {
+        UI.showToast("Failed to load preferences", "error");
+      });
+  };
+
   /* ================================
   📌 INIT
  ================================= */
@@ -227,6 +253,8 @@
       window.location.href = "/pages/login/login.html";
       return;
     }
+
+    NotificationsPage.loadPreferences();
 
     // 🟢 تحميل الإشعارات
     NotificationsPage.loadNotifications();
@@ -245,6 +273,28 @@
 
     console.log("🔍 Checking notif-badge:", document.getElementById("notif-badge"));
     console.log("🔍 Checking notifications-list:", document.getElementById("notifications-list"));
+
+
+    var saveBtn = document.getElementById("save-prefs-btn");
+
+    if (saveBtn) {
+      saveBtn.addEventListener("click", function () {
+        var prefs = {
+          emailOnReservationCreated: document.getElementById("pref-created").checked,
+          emailOnReservationUpdated: document.getElementById("pref-updated").checked,
+          emailOnPaymentSuccess: document.getElementById("pref-payment-success").checked,
+          emailOnPaymentFailed: document.getElementById("pref-payment-failed").checked
+        };
+
+        NotificationsPage.updatePreferences(prefs)
+          .then(function () {
+            UI.showToast("Preferences updated successfully", "success");
+          })
+          .catch(function () {
+            UI.showToast("Failed to update preferences", "error");
+          });
+      });
+    }
 
   };
 

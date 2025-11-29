@@ -160,7 +160,10 @@
 
     var payload = {
       reservationId: Number(reservationId),
-      successUrl: window.location.origin + "/pages/payments/payment-success.html",
+
+      // مهم جدًا تحط session_id
+      successUrl: window.location.origin + "/pages/payments/payment-success.html?session_id={CHECKOUT_SESSION_ID}",
+
       cancelUrl: window.location.origin + "/pages/payments/payment-cancel.html"
     };
 
@@ -187,6 +190,7 @@
       });
   };
 
+
   // Global
   var selectedStartDate = null;
   var selectedEndDate = null;
@@ -203,18 +207,18 @@
   }
 
   // Calculate days between two dates
- // ===============================
-// PRICE CALCULATION AUTO UPDATE
-// ===============================
+  // ===============================
+  // PRICE CALCULATION AUTO UPDATE
+  // ===============================
 
-function calculateDays(start, end) {
+  function calculateDays(start, end) {
     const s = new Date(start);
     const e = new Date(end);
     const diff = e - s;
     return diff > 0 ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : 0;
-}
+  }
 
-function updatePrice() {
+  function updatePrice() {
     const start = document.getElementById("pickupDate").value;
     const end = document.getElementById("returnDate").value;
 
@@ -224,13 +228,13 @@ function updatePrice() {
     const pricePerDay = Number(currentCar?.pricePerDay || 0);
 
     if (days <= 0) {
-        document.getElementById("totalPrice").innerText = "$0.00";
-        return;
+      document.getElementById("totalPrice").innerText = "$0.00";
+      return;
     }
 
     const total = days * pricePerDay;
     document.getElementById("totalPrice").innerText = "$" + total.toFixed(2);
-}
+  }
 
 
 
@@ -317,7 +321,7 @@ function updatePrice() {
     PaymentMethodPage.loadCarInfo(currentCarId);
     // Listen for date changes
     document.getElementById("pickupDate").addEventListener("change", updatePrice);
-document.getElementById("returnDate").addEventListener("change", updatePrice);
+    document.getElementById("returnDate").addEventListener("change", updatePrice);
 
   };
 
