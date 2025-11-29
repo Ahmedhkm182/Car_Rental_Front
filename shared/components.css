@@ -475,3 +475,86 @@
 .hidden {
   display: none !important;
 }
+
+/* Modern Toast */
+.toast {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  padding: 16px 22px;
+  background: #4f46e5;
+  color: white;
+  border-radius: 12px;
+  font-size: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all .3s ease;
+  z-index: 99999;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.error {
+  background: #dc2626;
+}
+
+/* Modern Confirmation Modal */
+.confirm-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  opacity: 0;
+  pointer-events: none;
+  transition: .2s;
+}
+
+.confirm-modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.confirm-box {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  width: 350px;
+  text-align: center;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.15);
+  animation: pop .25s ease;
+}
+
+@keyframes pop {
+  from { transform: scale(.85); opacity: .4; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.confirm-btns {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.confirm-btns button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: #e5e7eb;
+}
+
+.btn-confirm {
+  background: #dc2626;
+  color: white;
+}

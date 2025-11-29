@@ -386,3 +386,52 @@
   };
 
 })(window);
+window.UI = window.UI || {};
+
+UI.showToast = function (msg, type = "success") {
+  let toast = document.createElement("div");
+  toast.className = "toast " + (type === "error" ? "error" : "");
+  toast.innerText = msg;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.classList.add("show"), 50);
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+};
+
+UI.confirm = function (message) {
+  return new Promise((resolve) => {
+    const modal = document.createElement("div");
+    modal.className = "confirm-modal";
+
+    modal.innerHTML = `
+      <div class="confirm-box">
+        <h3 style="margin-bottom:10px;">${message}</h3>
+        <div class="confirm-btns">
+          <button class="btn-cancel">Cancel</button>
+          <button class="btn-confirm">Yes</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    setTimeout(() => modal.classList.add("show"), 20);
+
+    modal.querySelector(".btn-cancel").onclick = () => {
+      modal.classList.remove("show");
+      setTimeout(() => modal.remove(), 200);
+      resolve(false);
+    };
+
+    modal.querySelector(".btn-confirm").onclick = () => {
+      modal.classList.remove("show");
+      setTimeout(() => modal.remove(), 200);
+      resolve(true);
+    };
+  });
+};

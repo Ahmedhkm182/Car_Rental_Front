@@ -1,8 +1,8 @@
-/* pages/reservations/reservations.js */
 (function (window) {
   window.ReservationsPage = window.ReservationsPage || {};
 
-  // API Functions
+  var reservationsList = null;
+
   ReservationsPage.getMyReservations = function () {
     return window.Api.fetch("/Reservation/my", { method: "GET" });
   };
@@ -12,168 +12,94 @@
   };
 
   ReservationsPage.cancelReservation = function (id) {
-    return window.Api.fetch("/Reservation/" + encodeURIComponent(id), { method: "DELETE" });
+    return window.Api.fetch("/Reservation/" + encodeURIComponent(id), {
+      method: "DELETE"
+    });
   };
 
-  // Render Functions
-  ReservationsPage.renderReservations = function (reservations) {
+  ReservationsPage.renderReservations = function (items, isAdmin) {
     var container = document.getElementById("reservations-list");
     if (!container) return;
 
     container.innerHTML = "";
 
-    if (!reservations || reservations.length === 0) {
+    if (!items || items.length === 0) {
       container.innerHTML = `
-        <div class="no-reservations">
-          <div class="no-reservations-icon">📅</div>
-          <p class="no-reservations-text">You have no reservations yet</p>
-          <a href="/pages/cars/cars.html">Browse Cars</a>
-        </div>
-      `;
+        <div class="empty-box">
+          <p>No reservations found.</p>
+        </div>`;
       return;
     }
 
-    reservations.forEach(function (reservation) {
+    items.forEach(function (r) {
+      var carImg = r.car?.imageUrl
+        ? r.car.imageUrl
+        : "/assets/car-placeholder.svg";
+
       var card = document.createElement("div");
       card.className = "reservation-card";
 
-      var startDate = formatDate(reservation.startDate);
-      var endDate = formatDate(reservation.endDate);
-      var statusClass = (reservation.status || "").toLowerCase();
+      card.innerHTML = `
+        <div class="reservation-image" style="background-image:url('${carImg}')"></div>
+        <div class="reservation-body">
+          <h3>${r.car?.make || ""} ${r.car?.model || ""}</h3>
 
-      var html = `
-        <div class="reservation-header">
-          <div class="reservation-car">${escapeHtml((reservation.car && reservation.car.make || "") + " " + (reservation.car && reservation.car.model || ""))}</div>
-          <span class="reservation-status ${statusClass}">${reservation.status || "Unknown"}</span>
-        </div>
+          <p><strong>Pickup:</strong> ${r.startDate.split("T")[0]}</p>
+          <p><strong>Return:</strong> ${r.endDate.split("T")[0]}</p>
+          <p><strong>Status:</strong> <span class="status ${r.status.toLowerCase()}">${r.status}</span></p>
+          <p><strong>Total:</strong> $${Number(r.totalPrice || 0).toFixed(2)}</p>
 
-        <div class="reservation-details">
-          <div class="reservation-detail-row">
-            <span class="reservation-detail-label">Pickup Date:</span>
-            <span class="reservation-detail-value">${startDate}</span>
+          <div class="reservation-actions">
+            ${!isAdmin ? `
+              <button class="btn btn-danger btn-sm" onclick="window.ReservationsPage.onCancel(${r.id})">
+                Cancel
+              </button>
+            ` : ""}
           </div>
-          <div class="reservation-detail-row">
-            <span class="reservation-detail-label">Return Date:</span>
-            <span class="reservation-detail-value">${endDate}</span>
-          </div>
-          <div class="reservation-detail-row">
-            <span class="reservation-detail-label">Location:</span>
-            <span class="reservation-detail-value">${escapeHtml(reservation.pickupLocation || "N/A")}</span>
-          </div>
-        </div>
-
-        <div class="reservation-price">$${Number(reservation.totalPrice || 0).toFixed(2)}</div>
-
-        <div class="reservation-actions">
-          ${reservation.status === "Active" ? `<button class="btn btn-danger btn-sm" onclick="window.ReservationsPage.cancelReservationPrompt('${reservation.id}')">Cancel</button>` : ""}
-          ${reservation.status === "Active" ? `<button class="btn btn-primary btn-sm" onclick="window.ReservationsPage.initiatePayment('${reservation.id}')">Pay</button>` : ""}
-          <button class="btn btn-secondary btn-sm" onclick="window.ReservationsPage.viewDetails('${reservation.id}')">Details</button>
         </div>
       `;
 
-      card.innerHTML = html;
       container.appendChild(card);
     });
   };
 
-  ReservationsPage.cancelReservationPrompt = function (id) {
-    if (!confirm("Are you sure you want to cancel this reservation?")) return;
+  ReservationsPage.onCancel = function (id) {
+    UI.confirm("Are you sure you want to cancel this reservation?")
+      .then((ok) => {
+        if (!ok) return;
 
-    var btn = event.target;
-    btn.disabled = true;
-    var originalText = btn.innerText;
-    btn.innerText = "Cancelling...";
-
-    ReservationsPage.cancelReservation(id)
-      .then(function () {
-        ReservationsPage.loadReservations();
-      })
-      .catch(function (err) {
-        alert(err.message || "Failed to cancel reservation");
-        btn.disabled = false;
-        btn.innerText = originalText;
+        ReservationsPage.cancelReservation(id)
+          .then((res) => {
+            console.log("Cancel Response:", res);
+            UI.showToast("Reservation cancelled", "success");
+            ReservationsPage.load();   // ✔ الصحيح
+          })
+          .catch((err) => {
+            console.error("Cancel Error:", err);
+            UI.showToast("Failed to cancel reservation", "error");
+          });
       });
   };
 
-  ReservationsPage.viewDetails = function (id) {
-    alert("Reservation ID: " + id);
-  };
 
-  ReservationsPage.initiatePayment = function (reservationId) {
-    if (!reservationId) {
-      alert("Reservation ID not found");
-      return;
-    }
-
-    var btn = event.target;
-    btn.disabled = true;
-    var originalText = btn.innerText;
-    btn.innerText = "Processing...";
-
-    window.Payments.createPaymentSession(reservationId)
-      .then(function () {
-        // Redirect happens automatically in createPaymentSession
-      })
-      .catch(function (err) {
-        console.error("Failed to create payment session:", err);
-        alert(err.message || "Failed to initiate payment. Please try again.");
-        btn.disabled = false;
-        btn.innerText = originalText;
-      });
-  };
-
-  ReservationsPage.loadReservations = function () {
+  ReservationsPage.load = function () {
     var container = document.getElementById("reservations-list");
-    if (!container) return;
+    container.innerHTML = `<div class="loading-spinner"></div>`;
 
-    container.innerHTML = '<div class="loading-spinner"></div>';
+    var isAdmin = window.Auth.isAdmin && window.Auth.isAdmin();
 
-    var isAdmin = window.Auth && window.Auth.isAdmin && window.Auth.isAdmin();
-    var promise = isAdmin
+    var apiCall = isAdmin
       ? ReservationsPage.getAllReservations()
       : ReservationsPage.getMyReservations();
 
-    promise
-      .then(function (reservations) {
-        ReservationsPage.renderReservations(reservations || []);
+    apiCall
+      .then(function (items) {
+        ReservationsPage.renderReservations(items || [], isAdmin);
       })
-      .catch(function (err) {
-        container.innerHTML = '<div class="no-reservations"><p style="color: #ef4444;">Failed to load reservations</p></div>';
+      .catch(function () {
+        container.innerHTML = `<p class="error-text">Failed to load reservations</p>`;
       });
   };
 
-  ReservationsPage.init = function () {
-    // Check authentication
-    if (!window.Auth || !window.Auth.isAuthenticated || !window.Auth.isAuthenticated()) {
-      window.location.href = "/pages/login/login.html";
-      return;
-    }
-
-    var isAdmin = window.Auth.isAdmin && window.Auth.isAdmin();
-    var pageTitle = document.getElementById("page-title");
-    if (pageTitle) {
-      pageTitle.innerText = isAdmin ? "All Reservations" : "My Reservations";
-    }
-
-    ReservationsPage.loadReservations();
-  };
-
-  function formatDate(dateString) {
-    if (!dateString) return "N/A";
-    try {
-      var date = new Date(dateString);
-      return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
-    } catch (e) {
-      return dateString;
-    }
-  }
-
-  function escapeHtml(text) {
-    var div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  // Initialize on DOM load
-  document.addEventListener("DOMContentLoaded", ReservationsPage.init);
+  document.addEventListener("DOMContentLoaded", ReservationsPage.load);
 })(window);

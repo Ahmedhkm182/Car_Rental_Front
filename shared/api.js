@@ -15,13 +15,13 @@
   window.Api.setToken = function (token) {
     try {
       localStorage.setItem(window.Api.TOKEN_KEY, token);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   window.Api.clearToken = function () {
     try {
       localStorage.removeItem(window.Api.TOKEN_KEY);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   window.Api.handleUnauthorized = function () {
@@ -71,13 +71,14 @@
         });
       }
       return res.text().then(function (text) {
-        if (!text) return null;
+        if (!text) return {};   // بدل null
         try {
           return JSON.parse(text);
         } catch (e) {
-          return text;
+          return { raw: text };
         }
       });
+
     });
   };
 
@@ -114,13 +115,14 @@
         });
       }
       return res.text().then(function (text) {
-        if (!text) return null;
+        if (!text) return {};
         try {
           return JSON.parse(text);
         } catch (e) {
-          return text;
+          return { raw: text };
         }
       });
+
     });
   };
 })(window);

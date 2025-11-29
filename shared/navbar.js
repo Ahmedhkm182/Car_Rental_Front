@@ -104,5 +104,8 @@
   // Auto-mount on DOMContentLoaded
   document.addEventListener("DOMContentLoaded", function () {
     window.Navbar.mount("navbar-root");
+    // Notify other scripts that navbar is mounted
+document.dispatchEvent(new Event("navbar-mounted"));
+
   });
 })(window);

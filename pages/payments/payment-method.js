@@ -56,7 +56,7 @@
   PaymentMethodPage.selectPaymentMethod = function (method) {
     console.log("🔥 selectPaymentMethod called:", method);
     if (!currentCarId) {
-      alert("Car ID not found");
+      UI && UI.showToast ? UI.showToast("Car ID not found", "error") : alert("Car ID not found");
       return;
     }
 
@@ -71,48 +71,93 @@
         PaymentMethodPage.initiateStripePayment();
         break;
 
-
       case 'bank-transfer':
         // Redirect to bank transfer instructions
         window.location.href = "/pages/payments/payment-bank-transfer.html?carId=" + encodeURIComponent(currentCarId);
         break;
 
       default:
-        alert("Unknown payment method");
+        UI && UI.showToast ? UI.showToast("Unknown payment method", "error") : alert("Unknown payment method");
     }
   };
 
+  // Create reservation (returns the API response)
   PaymentMethodPage.createReservation = function () {
+
+    // 1) اقرأ قيم الحقول
+    var start = document.getElementById("pickupDate").value;
+    var end = document.getElementById("returnDate").value;
+
+    // 2) Validations
+    if (!start || !end) {
+      UI.showToast("Please select pickup and return dates", "error");
+      return Promise.reject("Missing dates");
+    }
+
+    if (new Date(end) <= new Date(start)) {
+      UI.showToast("Return date must be after pickup date", "error");
+      return Promise.reject("Invalid dates");
+    }
+
+    // 3) ابعت للباك
     return window.Api.fetch("/Reservation/create", {
       method: "POST",
       body: {
         carId: Number(currentCarId),
-        startDate: new Date().toISOString(),
-        endDate: new Date().toISOString()
+        startDate: start,
+        endDate: end
       }
     });
   };
 
 
-  PaymentMethodPage.initiateStripePayment = function () {
-    console.log("🔥 Stripe Clicked!", currentCarId);
 
-    if (!currentCarId) {
-      alert("Car ID not found");
+
+  // get current user's reservations (used to find the created reservation id if create doesn't return it)
+  PaymentMethodPage.getMyReservations = function () {
+    return window.Api.fetch("/Reservation/my", { method: "GET" });
+  };
+
+  // helper to extract id from possible shapes
+  function extractIdFromReservation(obj) {
+    if (!obj) return null;
+    if (obj.id) return obj.id;
+    if (obj.reservationId) return obj.reservationId;
+    if (obj.reservationID) return obj.reservationID;
+    if (obj.Id) return obj.Id;
+    return null;
+  }
+
+  // try to find reservation for current car from /Reservation/my list
+  PaymentMethodPage.findReservationForCar = function (list) {
+    if (!Array.isArray(list)) return null;
+
+    // normalize currentCarId to number/string
+    var carIdNum = Number(currentCarId);
+    for (var i = list.length - 1; i >= 0; i--) {
+      var r = list[i];
+      // possible fields: r.car?.id, r.carId, r.car?.id
+      var rCarId = null;
+      if (r.car && (r.car.id || r.carId)) rCarId = r.car.id || r.carId;
+      if (!rCarId && (r.carId || r.CarId)) rCarId = r.carId || r.CarId;
+      if (!rCarId && r.car && typeof r.car === "number") rCarId = r.car;
+
+      // try numeric compare
+      if (rCarId && Number(rCarId) === carIdNum) {
+        var rid = extractIdFromReservation(r);
+        if (rid) return rid;
+      }
+    }
+    return null;
+  };
+
+  // Start stripe payment with a known reservationId
+  PaymentMethodPage.startStripePayment = function (reservationId) {
+    if (!reservationId) {
+      UI && UI.showToast ? UI.showToast("Invalid reservation id", "error") : alert("Invalid reservation id");
       return;
     }
 
-    // 1) هات reservationId لو موجود
-    var reservationId = PaymentMethodPage.getQueryParam("reservationId");
-
-    console.log("reservationId:", reservationId);
-
-    // 2) لو مفيش → اعمله Placeholder مؤقت (لحد ما تبني صفحة الحجز الفعلية)
-    if (!reservationId) {
-      reservationId = currentCarId; // مؤقت لحد ما يبدأ الحجز بجد
-    }
-
-    // 3) بنعمل payload
     var payload = {
       reservationId: Number(reservationId),
       successUrl: window.location.origin + "/pages/payments/payment-success.html",
@@ -121,7 +166,6 @@
 
     console.log("🚀 Sending payload:", payload);
 
-    // 4) API call
     window.Api.fetch("/Payment/create-session", {
       method: "POST",
       body: payload
@@ -130,24 +174,124 @@
         console.log("🔵 Stripe API Response:", res);
 
         if (!res || !res.checkoutUrl) {
-          alert("Payment session failed");
+          UI && UI.showToast ? UI.showToast("Payment session failed", "error") : alert("Payment session failed");
           return;
         }
 
         console.log("Redirecting to:", res.checkoutUrl);
-
-        // 5) Redirect to Stripe checkout URL
         window.location.href = res.checkoutUrl;
       })
       .catch(function (err) {
         console.error("❌ Stripe Error:", err);
-        alert("Error creating payment session");
+        UI && UI.showToast ? UI.showToast("Error creating payment session", "error") : alert("Error creating payment session");
       });
   };
 
+  // Global
+  var selectedStartDate = null;
+  var selectedEndDate = null;
+
+  // Format dates in English
+  function formatDateEnglish(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    });
+  }
+
+  // Calculate days between two dates
+ // ===============================
+// PRICE CALCULATION AUTO UPDATE
+// ===============================
+
+function calculateDays(start, end) {
+    const s = new Date(start);
+    const e = new Date(end);
+    const diff = e - s;
+    return diff > 0 ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : 0;
+}
+
+function updatePrice() {
+    const start = document.getElementById("pickupDate").value;
+    const end = document.getElementById("returnDate").value;
+
+    if (!start || !end) return;
+
+    const days = calculateDays(start, end);
+    const pricePerDay = Number(currentCar?.pricePerDay || 0);
+
+    if (days <= 0) {
+        document.getElementById("totalPrice").innerText = "$0.00";
+        return;
+    }
+
+    const total = days * pricePerDay;
+    document.getElementById("totalPrice").innerText = "$" + total.toFixed(2);
+}
 
 
 
+
+
+  PaymentMethodPage.initiateStripePayment = function () {
+    console.log("🔥 Stripe Clicked!", currentCarId);
+
+    if (!currentCarId) {
+      UI && UI.showToast ? UI.showToast("Car ID not found", "error") : alert("Car ID not found");
+      return;
+    }
+
+    // 1) get reservationId from URL if present
+    var reservationId = PaymentMethodPage.getQueryParam("reservationId");
+    console.log("reservationId (from url):", reservationId);
+
+    // 2) if reservationId exists -> start payment directly
+    if (reservationId) {
+      PaymentMethodPage.startStripePayment(reservationId);
+      return;
+    }
+
+    // 3) No reservationId -> create reservation then start payment
+    console.log("⚠ No reservationId found → Creating reservation...");
+    PaymentMethodPage.createReservation()
+      .then(function (createRes) {
+        // createRes might be a shape { reservationId: X } or { id: X } or just { Message: '...' }
+        console.log("Create reservation response:", createRes);
+
+        var createdId = null;
+        if (createRes) {
+          createdId = extractIdFromReservation(createRes);
+        }
+
+        if (createdId) {
+          console.log("✅ Reservation created with ID (from create response):", createdId);
+          PaymentMethodPage.startStripePayment(createdId);
+          return;
+        }
+
+        // If API didn't return id directly, try to fetch /Reservation/my and find the reservation for this car
+        return PaymentMethodPage.getMyReservations()
+          .then(function (list) {
+            console.log("Fetched my reservations:", list);
+            var foundId = PaymentMethodPage.findReservationForCar(list);
+            if (foundId) {
+              console.log("✅ Found reservation id from /Reservation/my:", foundId);
+              PaymentMethodPage.startStripePayment(foundId);
+              return;
+            }
+
+            // nothing found -> show error
+            UI && UI.showToast ? UI.showToast("Failed to find created reservation", "error") : alert("Failed to find created reservation");
+          });
+      })
+      .catch(function (err) {
+        console.error("Failed to create reservation:", err);
+        UI && UI.showToast ? UI.showToast("Failed to create reservation", "error") : alert("Failed to create reservation");
+      });
+  };
 
   PaymentMethodPage.init = function () {
     // Check authentication
@@ -160,13 +304,21 @@
     if (!currentCarId) {
       var errorDiv = document.getElementById("payment-error");
       var errorMessage = document.getElementById("error-message");
-      errorDiv.classList.remove("hidden");
-      errorMessage.textContent = "Car ID not provided in URL";
+      if (errorDiv && errorMessage) {
+        errorDiv.classList.remove("hidden");
+        errorMessage.textContent = "Car ID not provided in URL";
+      } else {
+        UI && UI.showToast ? UI.showToast("Car ID not provided in URL", "error") : alert("Car ID not provided in URL");
+      }
       return;
     }
 
     // Load car information
     PaymentMethodPage.loadCarInfo(currentCarId);
+    // Listen for date changes
+    document.getElementById("pickupDate").addEventListener("change", updatePrice);
+document.getElementById("returnDate").addEventListener("change", updatePrice);
+
   };
 
   function escapeHtml(text) {

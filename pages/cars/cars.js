@@ -27,8 +27,9 @@
   };
 
   CarsPage.deleteCar = function (id) {
-    return window.Api.fetch("/Car/" + encodeURIComponent(id), { method: "DELETE" });
+    return window.Api.fetch("/Car/delete/" + encodeURIComponent(id), { method: "DELETE" });
   };
+
 
   // Render Functions
   CarsPage.renderCars = function (cars) {

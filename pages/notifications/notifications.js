@@ -5,23 +5,38 @@
   var pollInterval = null;
   const POLL_MS = 10000;
 
-  // API Functions
+  /* ================================
+     📌 API FUNCTIONS
+  ================================= */
+
   NotificationsPage.fetchNotifications = function () {
     return window.Api.fetch("/Notification/my", { method: "GET" });
   };
 
   NotificationsPage.markRead = function (id) {
-    return window.Api.fetch("/Notification/mark-read/" + encodeURIComponent(id), { method: "PUT" });
+    return window.Api.fetch("/Notification/mark-read/" + encodeURIComponent(id), {
+      method: "PUT"
+    });
   };
 
   NotificationsPage.markAllRead = function () {
-    return window.Api.fetch("/Notification/mark-all-read", { method: "PUT" });
+    return window.Api.fetch("/Notification/mark-all-read", {
+      method: "PUT"
+    });
   };
 
-  // Render Functions
+  /* ================================
+     📌 RENDER FUNCTIONS
+  ================================= */
+
   NotificationsPage.renderNotifications = function (notifications) {
+    console.log("🎨 Rendering Notifications...", notifications);
     var container = document.getElementById("notifications-list");
-    if (!container) return;
+    console.log("📦 Render Container:", container);
+    if (!container) {
+      console.log("❌ Container NOT FOUND — STOPPING RENDER");
+      return;
+    }
 
     container.innerHTML = "";
 
@@ -39,7 +54,9 @@
       var item = document.createElement("div");
       item.className = "notif-item " + (notif.read ? "read" : "unread");
 
-      var createdAt = notif.createdAt ? new Date(notif.createdAt).toLocaleString() : "Just now";
+      var createdAt = notif.createdAt
+        ? new Date(notif.createdAt).toLocaleString()
+        : "Just now";
 
       var html = `
         <div class="notif-content">
@@ -47,9 +64,19 @@
           <div class="notif-message">${escapeHtml(notif.message || "")}</div>
           <div class="notif-time">${createdAt}</div>
         </div>
+
         <div class="notif-actions">
-          <span class="notif-status ${notif.read ? "read" : "unread"}">${notif.read ? "Read" : "Unread"}</span>
-          ${!notif.read ? `<button class="btn btn-primary btn-sm" onclick="window.NotificationsPage.markAsRead('${notif.id}')">Mark Read</button>` : ""}
+          <span class="notif-status ${notif.read ? "read" : "unread"}">
+            ${notif.read ? "Read" : "Unread"}
+          </span>
+
+          ${!notif.read
+          ? `<button class="btn btn-primary btn-sm"
+                    onclick="window.NotificationsPage.markAsRead('${notif.id}')">
+                    Mark Read
+                 </button>`
+          : ""
+        }
         </div>
       `;
 
@@ -58,46 +85,111 @@
     });
   };
 
+  /* ================================
+     📌 MARK AS READ (single)
+  ================================= */
+
   NotificationsPage.markAsRead = function (id) {
     NotificationsPage.markRead(id)
       .then(function () {
-        NotificationsPage.loadNotifications();
+
+        // Toast message
+        if (window.UI && UI.showToast)
+          UI.showToast("Notification marked as read", "success");
+
+        // Reload notifications visually
+        return NotificationsPage.loadNotifications();
+      })
+      .then(function () {
+
+        // Update navbar badge
         NotificationsPage.updateNotificationBadge();
       })
       .catch(function (err) {
-        alert("Failed to mark notification as read");
+        console.error("Mark read error:", err);
+
+        if (window.UI && UI.showToast)
+          UI.showToast("Failed to mark notification as read", "error");
       });
   };
+
+  /* ================================
+     📌 LOAD NOTIFICATIONS
+  ================================= */
 
   NotificationsPage.loadNotifications = function () {
     var container = document.getElementById("notifications-list");
     if (!container) return;
 
-    container.innerHTML = '<div class="loading-spinner"></div>';
+    container.innerHTML = `<div class="loading-spinner"></div>`;
 
     NotificationsPage.fetchNotifications()
       .then(function (notifications) {
+        console.log("📩 API Returned Notifications:", notifications);
+
+        var container = document.getElementById("notifications-list");
+        console.log("🧩 Container Found:", container);
+
         NotificationsPage.renderNotifications(notifications || []);
       })
-      .catch(function (err) {
-        container.innerHTML = '<div class="notif-empty"><p style="color: #ef4444;">Failed to load notifications</p></div>';
+
+      .catch(function () {
+        container.innerHTML = `<p style="color:#ef4444;">Failed to load notifications</p>`;
       });
   };
+
+  /* ================================
+     📌 UPDATE NAVBAR BADGE
+  ================================= */
 
   NotificationsPage.updateNotificationBadge = function () {
     NotificationsPage.fetchNotifications()
       .then(function (notifications) {
         if (!window.Navbar || !window.Navbar.updateNotificationBadge) return;
-        var unreadCount = 0;
-        if (notifications && Array.isArray(notifications)) {
-          notifications.forEach(function (n) {
-            if (!n.read) unreadCount++;
-          });
-        }
-        window.Navbar.updateNotificationBadge(unreadCount);
+
+        var unread = notifications.filter(n => !n.read).length;
+        window.Navbar.updateNotificationBadge(unread);
       })
-      .catch(function () {});
+      .catch(function () { });
   };
+
+  /* ================================
+     📌 MARK ALL READ
+  ================================= */
+
+  NotificationsPage.handleMarkAll = function () {
+    var btn = document.getElementById("mark-all-btn");
+    if (!btn) return;
+
+    btn.disabled = true;
+    var oldText = btn.innerText;
+    btn.innerText = "Marking...";
+
+    NotificationsPage.markAllRead()
+      .then(function () {
+        if (window.UI && UI.showToast)
+          UI.showToast("All notifications marked as read", "success");
+
+        return NotificationsPage.loadNotifications();
+      })
+      .then(function () {
+        NotificationsPage.updateNotificationBadge();
+        btn.disabled = false;
+        btn.innerText = oldText;
+      })
+      .catch(function () {
+        if (window.UI && UI.showToast)
+          UI.showToast("Failed to mark all as read", "error");
+
+        btn.disabled = false;
+        btn.innerText = oldText;
+      });
+  };
+
+
+  /* ================================
+     📌 POLLING (auto refresh)
+  ================================= */
 
   NotificationsPage.startPolling = function () {
     NotificationsPage.stopPolling();
@@ -114,43 +206,50 @@
     }
   };
 
+  function waitForNavbarReady(callback) {
+    const badge = document.getElementById("notif-badge");
+    if (badge) {
+      callback(); // navbar جاهز
+    } else {
+      // لسه متحملش → استنى ورجع تاني
+      setTimeout(() => waitForNavbarReady(callback), 30);
+    }
+  }
+
+  /* ================================
+  📌 INIT
+ ================================= */
   NotificationsPage.init = function () {
-    // Check authentication
+
+
+    // 🛑 التحقق من تسجيل الدخول
     if (!window.Auth || !window.Auth.isAuthenticated || !window.Auth.isAuthenticated()) {
       window.location.href = "/pages/login/login.html";
       return;
     }
 
-    // Load notifications
+    // 🟢 تحميل الإشعارات
     NotificationsPage.loadNotifications();
     NotificationsPage.updateNotificationBadge();
 
-    // Mark all as read button
+    // 🟢 زر Mark All Read
     var markAllBtn = document.getElementById("mark-all-btn");
     if (markAllBtn) {
-      markAllBtn.addEventListener("click", function () {
-        markAllBtn.disabled = true;
-        var originalText = markAllBtn.innerText;
-        markAllBtn.innerText = "Marking...";
-
-        NotificationsPage.markAllRead()
-          .then(function () {
-            NotificationsPage.loadNotifications();
-            NotificationsPage.updateNotificationBadge();
-            markAllBtn.disabled = false;
-            markAllBtn.innerText = originalText;
-          })
-          .catch(function () {
-            alert("Failed to mark all as read");
-            markAllBtn.disabled = false;
-            markAllBtn.innerText = originalText;
-          });
-      });
+      markAllBtn.addEventListener("click", NotificationsPage.handleMarkAll);
     }
 
-    // Start polling
+    // 🟢 تشغيل الـ polling كل 10 ثواني
     NotificationsPage.startPolling();
+
+    console.log("🚀 NotificationsPage.init START");
+
+    console.log("🔍 Checking notif-badge:", document.getElementById("notif-badge"));
+    console.log("🔍 Checking notifications-list:", document.getElementById("notifications-list"));
+
   };
+
+
+  /* ================================ */
 
   function escapeHtml(text) {
     var div = document.createElement("div");
@@ -158,11 +257,15 @@
     return div.innerHTML;
   }
 
-  // Cleanup on page unload
-  window.addEventListener("beforeunload", function () {
-    NotificationsPage.stopPolling();
+  /* ================================ */
+
+  window.addEventListener("beforeunload", NotificationsPage.stopPolling);
+  if (window.__NOTIF_INIT__) return;
+  window.__NOTIF_INIT__ = true;
+
+  // document.addEventListener("DOMContentLoaded", NotificationsPage.init);
+  window.addEventListener("load", function () {
+    NotificationsPage.init();
   });
 
-  // Initialize on DOM load
-  document.addEventListener("DOMContentLoaded", NotificationsPage.init);
 })(window);
