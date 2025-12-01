@@ -81,7 +81,19 @@
           <div class="car-price">$${Number(car.pricePerDay || 0).toFixed(2)}/day</div>
           <span class="car-status ${statusClass}">${car.status || "Unknown"}</span>
           <div class="car-actions">
-            ${car.status === "Available" ? `<button class="btn btn-reserve" onclick="window.CarsPage.reserveCar('${car.id}')">Reserve Now</button>` : `<button class="btn" disabled style="background: #d1d5db;">Not Available</button>`}
+            ${car.status === "Available"
+          ? `
+      <button class="btn btn-reserve" onclick="window.CarsPage.reserveCar('${car.id}')">
+        Reserve Now
+      </button>`
+          : `
+      <div class="not-available-tag">
+        <span class="na-icon">🚫</span> 
+        <span class="na-text">Not Available</span>
+      </div>
+      `
+        }
+
             ${isAdmin ? `<button class="btn btn-secondary btn-sm" onclick="window.CarsPage.openEditModal('${car.id}')">Edit</button>` : ""}
           </div>
         </div>
