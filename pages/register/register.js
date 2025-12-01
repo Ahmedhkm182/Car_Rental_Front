@@ -47,10 +47,28 @@
           window.location.href = "/pages/login/login.html";
         })
         .catch(function (err) {
-          showError(err.message || "Registration failed. Please try again.");
+          let msg = "Registration failed. Please try again.";
+
+          // لو API رجّع Message مباشرة
+          if (err && err.Message) {
+            msg = err.Message;
+          }
+          // Errors array
+          else if (err && err.Errors && err.Errors.length > 0) {
+            msg = err.Errors[0];
+          }
+          // خاص بـ ModelState Errors
+          else if (err && err.errors) {
+            const firstKey = Object.keys(err.errors)[0];
+            msg = err.errors[firstKey][0];
+          }
+
+          showError(msg);
+
           submitBtn.disabled = false;
           submitBtn.innerText = originalText;
         });
+
     });
 
     function showError(message) {

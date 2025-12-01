@@ -1,27 +1,29 @@
 /* shared/api.js - API utility module */
 (function (window) {
   window.Api = window.Api || {};
+
+  // ================================
+  //  CONFIG
+  // ================================
   window.Api.BASE_API_URL = "https://localhost:44385/api";
   window.Api.TOKEN_KEY = "jwt_token";
 
+  // ================================
+  //  TOKEN HANDLING
+  // ================================
   window.Api.getToken = function () {
-    try {
-      return localStorage.getItem(window.Api.TOKEN_KEY);
-    } catch (e) {
-      return null;
-    }
+    try { return localStorage.getItem(window.Api.TOKEN_KEY); }
+    catch { return null; }
   };
 
   window.Api.setToken = function (token) {
-    try {
-      localStorage.setItem(window.Api.TOKEN_KEY, token);
-    } catch (e) { }
+    try { localStorage.setItem(window.Api.TOKEN_KEY, token); }
+    catch { }
   };
 
   window.Api.clearToken = function () {
-    try {
-      localStorage.removeItem(window.Api.TOKEN_KEY);
-    } catch (e) { }
+    try { localStorage.removeItem(window.Api.TOKEN_KEY); }
+    catch { }
   };
 
   window.Api.handleUnauthorized = function () {
@@ -29,100 +31,117 @@
     window.location.href = "/pages/login/login.html";
   };
 
+  // ================================
+  //  PARSE ERROR RESPONSE
+  // ================================
+  function parseErrorResponse(status, text) {
+    let data = null;
+
+    try { data = text ? JSON.parse(text) : null; }
+    catch { data = text; }
+
+    // ASP.NET validation errors
+    if (data && data.errors) {
+      let messages = [];
+
+      for (let key in data.errors) {
+        messages.push(`${key}: ${data.errors[key].join(", ")}`);
+      }
+
+      return {
+        status: status,
+        message: messages.join("\n"),
+        raw: data
+      };
+    }
+
+    return {
+      status: status,
+      message: data?.message || text || "Request failed",
+      raw: data
+    };
+  }
+
+  // ================================
+  //  NORMAL JSON FETCH
+  // ================================
   window.Api.fetch = function (path, options) {
     options = options || {};
-    var method = options.method || "GET";
-    var headers = options.headers || {};
-    var body = options.body;
+    let method = options.method || "GET";
+    let headers = options.headers || {};
+    let body = options.body;
 
-    var url = window.Api.BASE_API_URL + (path.charAt(0) === "/" ? path : ("/" + path));
-    var token = window.Api.getToken();
+    let url = window.Api.BASE_API_URL + (path.startsWith("/") ? path : "/" + path);
+    let token = window.Api.getToken();
 
-    if (token) {
-      headers["Authorization"] = "Bearer " + token;
-    }
+    if (token) headers["Authorization"] = "Bearer " + token;
 
     if (body && !(body instanceof FormData) && typeof body === "object") {
       body = JSON.stringify(body);
       headers["Content-Type"] = "application/json";
     }
 
-    var fetchOptions = { method: method, headers: headers, body: body };
-
-    return fetch(url, fetchOptions).catch(function (err) {
-      console.error("Fetch error for " + url, err);
-      return Promise.reject({
-        status: 0,
-        message: "Failed to fetch: " + err.message + ". Check if backend is running at " + window.Api.BASE_API_URL,
-        originalError: err
-      });
-    }).then(function (res) {
-      if (res.status === 401) {
-        window.Api.handleUnauthorized();
-        return Promise.reject({ status: 401, message: "Unauthorized" });
-      }
-      if (!res.ok) {
-        return res.text().then(function (text) {
-          return Promise.reject({
-            status: res.status,
-            message: text || "HTTP " + res.status + " error",
-            response: text
-          });
+    return fetch(url, { method, headers, body })
+      .catch(err => {
+        return Promise.reject({
+          status: 0,
+          message: "Failed to fetch: " + err.message,
+          originalError: err
         });
-      }
-      return res.text().then(function (text) {
-        if (!text) return {};   // بدل null
-        try {
-          return JSON.parse(text);
-        } catch (e) {
-          return { raw: text };
-        }
-      });
+      })
+      .then(async res => {
+        let text = await res.text();
 
-    });
+        // Unauthorized
+        if (res.status === 401) {
+          window.Api.handleUnauthorized();
+          return Promise.reject({ status: 401, message: "Unauthorized" });
+        }
+
+        // Normal error
+        if (!res.ok) {
+          return Promise.reject(parseErrorResponse(res.status, text));
+        }
+
+        // Success
+        try { return text ? JSON.parse(text) : {}; }
+        catch { return { raw: text }; }
+      });
   };
 
+  // ================================
+  //  FORMDATA FETCH (FILE UPLOAD)
+  // ================================
   window.Api.sendFormData = function (path, method, formData) {
-    var url = window.Api.BASE_API_URL + (path.charAt(0) === "/" ? path : ("/" + path));
-    var token = window.Api.getToken();
-    var headers = {};
+    let url = window.Api.BASE_API_URL + (path.startsWith("/") ? path : "/" + path);
+    let token = window.Api.getToken();
+    let headers = {};
 
-    if (token) {
-      headers["Authorization"] = "Bearer " + token;
-    }
+    if (token) headers["Authorization"] = "Bearer " + token;
 
-    var fetchOptions = { method: method, headers: headers, body: formData };
-
-    return fetch(url, fetchOptions).catch(function (err) {
-      console.error("Fetch error for " + url, err);
-      return Promise.reject({
-        status: 0,
-        message: "Failed to fetch: " + err.message + ". Check if backend is running at " + window.Api.BASE_API_URL,
-        originalError: err
-      });
-    }).then(function (res) {
-      if (res.status === 401) {
-        window.Api.handleUnauthorized();
-        return Promise.reject({ status: 401, message: "Unauthorized" });
-      }
-      if (!res.ok) {
-        return res.text().then(function (text) {
-          return Promise.reject({
-            status: res.status,
-            message: text || "HTTP " + res.status + " error",
-            response: text
-          });
+    return fetch(url, { method, headers, body: formData })
+      .catch(err => {
+        return Promise.reject({
+          status: 0,
+          message: "Failed to fetch: " + err.message,
+          originalError: err
         });
-      }
-      return res.text().then(function (text) {
-        if (!text) return {};
-        try {
-          return JSON.parse(text);
-        } catch (e) {
-          return { raw: text };
-        }
-      });
+      })
+      .then(async res => {
+        let text = await res.text();
 
-    });
+        if (res.status === 401) {
+          window.Api.handleUnauthorized();
+          return Promise.reject({ status: 401, message: "Unauthorized" });
+        }
+
+        if (!res.ok) {
+          return Promise.reject(parseErrorResponse(res.status, text));
+        }
+
+        try { return text ? JSON.parse(text) : {}; }
+        catch { return { raw: text }; }
+      });
   };
+
 })(window);

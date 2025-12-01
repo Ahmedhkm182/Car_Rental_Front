@@ -35,16 +35,21 @@
           window.location.href = "/index.html";
         })
         .catch(function (err) {
-          var errorMessage = "Login failed. Please try again.";
+          let errorMessage = "Login failed. Please try again.";
+
+          // لو السيرفر رجع رسالة واضحة
           if (err && err.message) {
             errorMessage = err.message;
-          } else if (err && typeof err === "string") {
+          } else if (typeof err === "string") {
             errorMessage = err;
           }
+
           showError(errorMessage);
+
           submitBtn.disabled = false;
           submitBtn.innerText = originalText;
         });
+
     });
 
     function showError(message) {

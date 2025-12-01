@@ -117,16 +117,19 @@
         <div class="form-group">
           <label for="modal-make">Make</label>
           <input id="modal-make" name="make" type="text" class="form-input" required />
+          <small class="error-text" id="error-Make"></small>
         </div>
 
         <div class="form-group">
           <label for="modal-model">Model</label>
           <input id="modal-model" name="model" type="text" class="form-input" required />
+           <small class="error-text" id="error-Model"></small>
         </div>
 
         <div class="form-group">
           <label for="modal-year">Year</label>
           <input id="modal-year" name="year" type="number" class="form-input" required />
+          <small class="error-text" id="error-Year"></small>
         </div>
 
         <div class="form-group">
@@ -136,17 +139,20 @@
             <option value="Rented">Rented</option>
             <option value="Maintenance">Maintenance</option>
           </select>
+          <small class="error-text" id="error-Status"></small>
         </div>
 
         <div class="form-group">
           <label for="modal-price">Price Per Day</label>
           <input id="modal-price" name="pricePerDay" type="number" step="0.01" class="form-input" required />
+          <small class="error-text" id="error-PricePerDay"></small>
         </div>
 
         <div class="form-group">
           <label for="modal-image-file">Car Image</label>
           <input id="modal-image-file" name="imageFile" type="file" accept="image/*" class="form-input file-input" />
           <small class="form-hint">Optional. For editing, leave empty to keep current image.</small>
+          <small class="error-text" id="error-ImageFile"></small>
         </div>
 
         <div id="image-preview" class="image-preview hidden">

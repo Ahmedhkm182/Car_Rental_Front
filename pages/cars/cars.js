@@ -201,10 +201,38 @@
         saveBtn.innerText = originalText;
       })
       .catch(function (err) {
+
+        // امسح أي أخطاء قديمة
+        document.querySelectorAll(".error-text").forEach(el => el.innerText = "");
+
+        // لو السيرفر رجّع ModelState Validation
+        if (err && err.response) {
+          try {
+            const parsed = JSON.parse(err.response);
+
+            if (parsed.errors) {
+              for (let key in parsed.errors) {
+                const fieldError = parsed.errors[key][0];
+                const errorEl = document.getElementById("error-" + key);
+                if (errorEl) {
+                  errorEl.innerText = fieldError;
+                }
+              }
+
+              saveBtn.disabled = false;
+              saveBtn.innerText = originalText;
+              return;
+            }
+          } catch (_) { }
+        }
+
+        // fallback
         alert(err.message || "Failed to save car");
+
         saveBtn.disabled = false;
         saveBtn.innerText = originalText;
       });
+
   };
 
   CarsPage.deleteCarConfirm = function () {
@@ -224,10 +252,28 @@
         deleteBtn.innerText = originalText;
       })
       .catch(function (err) {
-        alert(err.message || "Failed to delete car");
-        deleteBtn.disabled = false;
-        deleteBtn.innerText = originalText;
+        console.error("Add car error:", err);
+
+        let msg = "Failed to save car";
+
+        // لو السيرفر رجّع Validation Errors
+        if (err && err.errors) {
+          msg = Object.values(err.errors)
+            .flat()
+            .map(x => "• " + x)
+            .join("\n");
+        }
+        // لو رجع رسالة عادية
+        else if (err && err.message) {
+          msg = err.message;
+        }
+
+        alert(msg);
+
+        saveBtn.disabled = false;
+        saveBtn.innerText = originalText;
       });
+
   };
 
   CarsPage.reserveCar = function (carId) {
