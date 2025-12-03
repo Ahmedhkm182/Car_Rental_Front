@@ -42,7 +42,8 @@
       card.innerHTML = `
         <div class="reservation-image" style="background-image:url('${carImg}')"></div>
         <div class="reservation-body">
-          <h3>${r.car?.make || ""} ${r.car?.model || ""}</h3>
+         <h3>${r.carMake} ${r.carModel}</h3>
+<p><strong>Customer:</strong> ${r.userFullName}</p>
 
           <p><strong>Pickup:</strong> ${r.startDate.split("T")[0]}</p>
           <p><strong>Return:</strong> ${r.endDate.split("T")[0]}</p>

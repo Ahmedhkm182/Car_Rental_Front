@@ -37,7 +37,7 @@
             <li><a href="/" class="nav-link ${currentPage === "home" ? "active" : ""}">Home</a></li>
             <li><a href="/pages/cars/cars.html" class="nav-link ${currentPage === "cars" ? "active" : ""}">Cars</a></li>
             ${isAuthenticated ? `<li><a href="/pages/reservations/reservations.html" class="nav-link ${currentPage === "reservations" ? "active" : ""}">Reservations</a></li>` : ""}
-            ${isAuthenticated ? `<li><a href="/pages/notifications/notifications.html" class="nav-link ${currentPage === "notifications" ? "active" : ""}">Notifications</a></li>` : ""}
+            
             ${isAdmin ? `<li><a href="/pages/dashboard/dashboard.html" class="nav-link ${currentPage === "dashboard" ? "active" : ""}">Admin</a></li>` : ""}
           </ul>
 
@@ -105,7 +105,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     window.Navbar.mount("navbar-root");
     // Notify other scripts that navbar is mounted
-document.dispatchEvent(new Event("navbar-mounted"));
+    document.dispatchEvent(new Event("navbar-mounted"));
 
   });
 })(window);
