@@ -44,7 +44,7 @@
 
       window.Auth.register(fullName, email, password)
         .then(function () {
-          window.location.href = "/pages/login/login.html";
+          window.location.href = "/index.html";
         })
         .catch(function (err) {
           let msg = "Registration failed. Please try again.";
@@ -57,14 +57,17 @@
           else if (err && err.Errors && err.Errors.length > 0) {
             msg = err.Errors[0];
           }
-          // خاص بـ ModelState Errors
-          else if (err && err.errors) {
-            const firstKey = Object.keys(err.errors)[0];
-            msg = err.errors[firstKey][0];
+          // ModelState Errors (ASP.NET Core)
+          else if (err && err.raw && err.raw.errors) {   // ← حل المشكلة هنا
+            const firstKey = Object.keys(err.raw.errors)[0];
+            msg = err.raw.errors[firstKey][0];
+          }
+          // parseErrorResponse وضع الرسالة في err.message
+          else if (err && err.message) {
+            msg = err.message;
           }
 
           showError(msg);
-
           submitBtn.disabled = false;
           submitBtn.innerText = originalText;
         });

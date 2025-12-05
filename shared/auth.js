@@ -7,7 +7,7 @@
   window.Auth.setToken = function (token) {
     try {
       localStorage.setItem(TOKEN_KEY, token);
-    } catch (e) {}
+    } catch (e) { }
     if (window.Api && window.Api.setToken) window.Api.setToken(token);
   };
 
@@ -22,7 +22,7 @@
   window.Auth.clearToken = function () {
     try {
       localStorage.removeItem(TOKEN_KEY);
-    } catch (e) {}
+    } catch (e) { }
     if (window.Api && window.Api.clearToken) window.Api.clearToken();
   };
 
@@ -70,9 +70,16 @@
   };
 
   window.Auth.register = function (fullName, email, password) {
-    var body = { fullName: fullName, email: email, password: password };
-    return window.Api.fetch("/Auth/register", { method: "POST", body: body });
+    return window.Api.fetch("/Auth/register", {
+      method: "POST",
+      body: {
+        fullName: fullName,
+        email: email,
+        password: password
+      }
+    });
   };
+
 
   window.Auth.getCurrentUser = function () {
     var token = window.Auth.getToken();
