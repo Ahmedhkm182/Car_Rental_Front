@@ -6,10 +6,27 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 40%, #4338ca 100%);
+  /* Replace the gradient with background image */
+  background-image: url('../assets/generated-image.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   padding: 80px 20px 40px;
   margin-top: -70px;
   padding-top: 150px;
+}
+
+/* Dark overlay for text readability */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 0;
 }
 
 .hero-content {
@@ -27,6 +44,7 @@
   bottom: 0;
   overflow: hidden;
   z-index: 0;
+  display: none;
 }
 
 .blob {
