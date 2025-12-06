@@ -35,6 +35,12 @@
     });
   };
 
+  NotificationsPage.deleteNotification = function (id) {
+    return window.Api.fetch("/Notification/" + encodeURIComponent(id), {
+      method: "DELETE"
+    });
+  };
+
 
   /* ================================
      📌 RENDER FUNCTIONS
@@ -88,6 +94,10 @@
                  </button>`
           : ""
         }
+          <button class="btn btn-danger btn-sm"
+      onclick="window.NotificationsPage.deleteItem('${notif.id}')">
+      Delete
+  </button>
         </div>
       `;
 
@@ -121,6 +131,24 @@
 
         if (window.UI && UI.showToast)
           UI.showToast("Failed to mark notification as read", "error");
+      });
+  };
+
+
+  NotificationsPage.deleteItem = function (id) {
+    NotificationsPage.deleteNotification(id)
+      .then(function () {
+        if (window.UI && UI.showToast)
+          UI.showToast("Notification deleted", "success");
+
+        return NotificationsPage.loadNotifications();
+      })
+      .then(function () {
+        NotificationsPage.updateNotificationBadge();
+      })
+      .catch(function () {
+        if (window.UI && UI.showToast)
+          UI.showToast("Failed to delete notification", "error");
       });
   };
 
