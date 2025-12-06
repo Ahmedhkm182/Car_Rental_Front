@@ -51,11 +51,10 @@
           <p><strong>Total:</strong> $${Number(r.totalPrice || 0).toFixed(2)}</p>
 
           <div class="reservation-actions">
-            ${!isAdmin ? `
-              <button class="btn btn-danger btn-sm" onclick="window.ReservationsPage.onCancel(${r.id})">
-                Cancel
-              </button>
-            ` : ""}
+           <button class="btn btn-danger btn-sm" onclick="window.ReservationsPage.onCancel(${r.id})">
+  Cancel
+</button>
+
           </div>
         </div>
       `;
